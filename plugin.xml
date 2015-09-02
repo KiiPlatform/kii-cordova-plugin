@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="kiicloud-plugin" version="1.0.0">
+    <name>KiiCloudPlugin</name>
+    <description>Plugin for Kii Cloud</description>
+    <license>Apache 2.0</license>
+    <keywords>kiicloud</keywords>
+    <js-module src="www/kiisdk.js"
+               name="kii">
+      <clobbers target="kii" />
+    </js-module>
+    <js-module src="www/kiipush.js"
+               name="kiiPush">
+      <clobbers target="kiiPush" />
+    </js-module>    
+
+    <platform name="android">
+      <source-file src="src/android/com/kii/cordova/android/Configuration.java" target-dir="src/com/kii/cordova/android/" />
+      <source-file src="src/android/com/kii/cordova/android/JsonPath.java" target-dir="src/com/kii/cordova/android/" />
+      <source-file src="src/android/com/kii/cordova/android/KiiGCM.java" target-dir="src/com/kii/cordova/plugins/" />
+      <source-file src="src/android/com/kii/cordova/android/KiiGCMIntentService.java" target-dir="src/com/kii/cordova/android/" />
+      <source-file src="src/android/com/kii/cordova/android/KiiGCMReceiver.java" target-dir="src/com/kii/cordova/android/" />
+      <source-file src="src/android/com/kii/cordova/android/KiiGCMNotification.java" target-dir="src/com/kii/cordova/android/" />
+      <source-file src="src/android/com/kii/cordova/android/MessageType.java" target-dir="src/com/kii/cordova/android/" />
+      
+      <config-file target="AndroidManifest.xml" parent="/manifest">
+        <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+        <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+        <uses-permission android:name="android.permission.WAKE_LOCK" />
+        <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+        <permission android:name="$PACKAGE_NAME.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+        <uses-permission android:name="$PACKAGE_NAME.permission.C2D_MESSAGE" />
+      </config-file>
+      <config-file target="AndroidManifest.xml" parent="/manifest/application">
+        <receiver
+            android:name="com.kii.cordova.android.KiiGCMReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="$PACKAGE_NAME" />
+            </intent-filter>
+        </receiver>
+        <service android:name="com.kii.cordova.android.KiiGCMIntentService" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.kii.android.gcm.sender_id"
+            android:value="L$GCM_SENDER_ID" />
+      </config-file>
+      <framework src="com.google.android.gms:play-services-gcm:7.5.0" />
+      <framework src="com.android.support:support-v4:22.2.1" />
+      <framework src="com.squareup.okhttp:okhttp:2.4.0" />
+
+      <config-file target="res/xml/config.xml" parent="/*">
+        <feature name="KiiPush">
+          <param name="android-package" value="com.kii.cordova.android.KiiGCM"/>
+          <param name="onload" value="true" />
+        </feature>
+      </config-file>
+    </platform>
+
+    <platform name="ios">
+      <config-file target="config.xml" parent="/*">
+        <feature name="KiiPush">
+          <param name="ios-package" value="KiiPush"/>
+        </feature>
+      </config-file>
+
+      <source-file src="src/ios/AppDelegate+push.m" />
+      <source-file src="src/ios/KiiPush.m" />
+
+      <header-file src="src/ios/AppDelegate+push.h" />
+      <header-file src="src/ios/KiiPush.h" />
+    </platform>        
+</plugin>
