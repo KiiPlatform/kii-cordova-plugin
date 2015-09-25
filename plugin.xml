@@ -48,9 +48,13 @@
             android:name="com.kii.android.gcm.sender_id"
             android:value="L$GCM_SENDER_ID" />
       </config-file>
+      <!--
       <framework src="com.google.android.gms:play-services-gcm:7.5.0" />
       <framework src="com.android.support:support-v4:22.2.1" />
       <framework src="com.squareup.okhttp:okhttp:2.4.0" />
+      -->
+      <framework src="extras/google/google_play_services/libproject/google-play-services_lib" />
+      <dependency id="android.support.v4" />
 
       <config-file target="res/xml/config.xml" parent="/*">
         <feature name="KiiPush">
