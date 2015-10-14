@@ -5,14 +5,8 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaArgs;
@@ -22,7 +16,13 @@ import org.apache.cordova.CordovaWebView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.lang.ref.WeakReference;
 
 /**
@@ -32,7 +32,6 @@ public class KiiGCM extends CordovaPlugin {
     private static final String METHOD_INIT = "init";
     private static final String METHOD_REGISTER = "register";
 
-    private OkHttpClient mClient;
     private GoogleCloudMessaging mGCM;
 
     static CordovaWebView sWebView;
@@ -45,7 +44,6 @@ public class KiiGCM extends CordovaPlugin {
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
         sWebView = webView;
-        mClient = new OkHttpClient();
     }
 
     @Override
@@ -157,7 +155,6 @@ public class KiiGCM extends CordovaPlugin {
     }
 
     private void getToken(final CordovaArgs args, final CallbackContext callbackContext) {
-        Log.d("KiiGCM", "start getToken");
         if (sSenderId == null) {
             callbackContext.error("sender_id must not be empty");
             return;
@@ -202,7 +199,6 @@ public class KiiGCM extends CordovaPlugin {
     }
 
     private void installToken(final String appId, final String appKey, final String token, final String regId, final CallbackContext callbackContext) {
-        Log.d("KiiGCM", "start installToken");
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... args) {
@@ -214,20 +210,47 @@ public class KiiGCM extends CordovaPlugin {
                     // nop
                 }
 
-                Request.Builder builder = new Request.Builder();
-                builder.url("https://api-jp.kii.com/api/apps/" + appId + "/installations");
-                builder.post(RequestBody.create(MediaType.parse("application/vnd.kii.InstallationCreationRequest+json"), params.toString()));
-                builder.addHeader("x-kii-appid", appId);
-                builder.addHeader("x-kii-appkey", appKey);
-                builder.addHeader("authorization", "bearer " + token);
-
+                HttpURLConnection connection = null;
+                OutputStream out = null;
+                OutputStreamWriter writer = null;
+                BufferedWriter bw = null;
                 try {
-                    Response response = mClient.newCall(builder.build()).execute();
-                    String respBody = response.body().string();
-                    Log.v("install", respBody);
+                    URL url = new URL("https://api-jp.kii.com/api/apps/" + appId + "/installations");
+                    connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("POST");
+                    connection.setDoOutput(true);
+                    connection.setDoInput(true);
+                    connection.setRequestProperty("x-kii-appid", appId);
+                    connection.setRequestProperty("x-kii-appkey", appKey);
+                    connection.setRequestProperty("authorization", "bearer " + token);
+                    connection.setRequestProperty("Content-Type", "application/vnd.kii.InstallationCreationRequest+json");
+
+                    connection.connect();
+
+                    out = connection.getOutputStream();
+                    writer = new OutputStreamWriter(out);
+                    bw = new BufferedWriter(writer);
+
+                    bw.write(params.toString());
+                    bw.flush();
+                    bw.close();
+
+                    int status = connection.getResponseCode();
+                    return null;
+
+                } catch (MalformedURLException e) {
                     return null;
                 } catch (IOException e) {
                     return null;
+                } finally {
+                    try {
+                        if (bw != null) { bw.close(); }
+                        if (writer != null) { writer.close(); }
+                        if (out != null) { out.close(); }
+                        if (connection != null) { connection.disconnect(); }
+                    } catch (IOException e) {
+                        // nop
+                    }
                 }
             }
 
