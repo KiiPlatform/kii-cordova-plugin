@@ -1,9 +1,5 @@
 //
 //  KiiPush.m
-//  HelloCordova
-//
-//  Created by fkm on 2015/08/05.
-//
 //
 
 #import "KiiPush.h"
@@ -91,9 +87,6 @@
     
     self.callback = [options objectForKey:@"ecb"];
     
-    if (notificationTypes == UIRemoteNotificationTypeNone)
-        NSLog(@"PushPlugin.register: Push notification type is set to none");
-    
     self.isInline = NO;
     
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
@@ -112,16 +105,7 @@
         [self notificationReceived];	// go ahead and process it
 }
 
-/*
- - (void)isEnabled:(NSMutableArray *)arguments withDict:(NSMutableDictionary *)options {
- UIRemoteNotificationType type = [[UIApplication sharedApplication] enabledRemoteNotificationTypes];
- NSString *jsStatement = [NSString stringWithFormat:@"navigator.PushPlugin.isEnabled = %d;", type != UIRemoteNotificationTypeNone];
- NSLog(@"JSStatement %@",jsStatement);
- }
- */
-
 - (void)didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-    NSLog(@"start didRegisterForRemoteNotificationsWithDeviceToken");
     NSMutableDictionary *results = [NSMutableDictionary dictionary];
     NSString *token = [[[[deviceToken description] stringByReplacingOccurrencesOfString:@"<"withString:@""]
                         stringByReplacingOccurrencesOfString:@">" withString:@""]
@@ -175,8 +159,6 @@
 }
 
 - (void)notificationReceived {
-    NSLog(@"Notification received");
-    
     if (self.notificationMessage && self.callback)
     {
         NSMutableString *jsonStr = [NSMutableString stringWithString:@"{"];
@@ -192,8 +174,6 @@
             [jsonStr appendFormat:@"foreground:\"%d\"", 0];
         
         [jsonStr appendString:@"}"];
-        
-        NSLog(@"Msg: %@", jsonStr);
         
         NSString * jsCallBack = [NSString stringWithFormat:@"%@(%@);", self.callback, jsonStr];
         [self.webView stringByEvaluatingJavaScriptFromString:jsCallBack];
@@ -266,7 +246,7 @@
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
     params[@"installationRegistrationID"] = pushToken;
     params[@"deviceType"] = @"IOS";
-    params[@"development"] = @YES;
+    params[@"development"] = @NO;
     
     if (![NSJSONSerialization isValidJSONObject:params]) {
         return;
@@ -291,12 +271,9 @@
                                       return;
                                   }
                                   NSString* body = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-                                  NSLog(@"body = %@", body);
                               }
                               ];
     [task resume];
-    
-    //[self successWithMessage:pushToken];
 }
 
 @end

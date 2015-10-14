@@ -1,9 +1,5 @@
 //
 //  AppDelegate+push.m
-//  HelloCordova
-//
-//  Created by fkm on 2015/08/05.
-//
 //
 
 #import "AppDelegate+push.h"
@@ -25,8 +21,6 @@ static char launchNotificationKey;
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
-    NSLog(@"didReceiveNotification");
-    
     // Get application state for iOS4.x+ devices, otherwise assume active
     UIApplicationState appState = UIApplicationStateActive;
     if ([application respondsToSelector:@selector(applicationState)]) {
@@ -45,9 +39,6 @@ static char launchNotificationKey;
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    
-    NSLog(@"active");
-    
     //zero badge
     application.applicationIconBadgeNumber = 0;
     

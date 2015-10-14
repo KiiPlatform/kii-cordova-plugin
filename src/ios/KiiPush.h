@@ -1,9 +1,5 @@
 //
 //  KiiPush.h
-//  HelloCordova
-//
-//  Created by fkm on 2015/08/05.
-//
 //
 
 #import <Foundation/Foundation.h>
