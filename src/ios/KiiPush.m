@@ -22,6 +22,7 @@
     self.appId = options[@"app_id"];
     self.appKey = options[@"app_key"];
     self.accessToken = options[@"token"];
+    self.baseUrl = options[@"baseURL"];
     
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
     UIUserNotificationType UserNotificationTypes = UIUserNotificationTypeNone;
@@ -240,7 +241,7 @@
 - (void)installDevice:(NSString*)pushToken {
     NSURLSession *session = [NSURLSession sharedSession];
     
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api-jp.kii.com/api/apps/%@/installations", self.appId]];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/apps/%@/installations", self.baseUrl, self.appId]];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod:@"POST"];
     NSMutableDictionary *params = [NSMutableDictionary dictionary];

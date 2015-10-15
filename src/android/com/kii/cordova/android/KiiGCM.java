@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
@@ -43,6 +44,7 @@ public class KiiGCM extends CordovaPlugin {
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
+        Log.v("Kii", "initialize");
         sWebView = webView;
     }
 
@@ -139,6 +141,9 @@ public class KiiGCM extends CordovaPlugin {
 
         JSONObject directJson = options.optJSONObject("direct");
         saveConfiguration(context, MessageType.DIRECT_PUSH, directJson);
+        
+        sForeground = true;
+        sActivityRef = new WeakReference<Activity>(cordova.getActivity());
     }
 
     private void saveConfiguration(Context context, MessageType type, JSONObject json) {
@@ -167,6 +172,7 @@ public class KiiGCM extends CordovaPlugin {
         final String appId = options.optString("app_id", "");
         final String appKey = options.optString("app_key", "");
         final String token = options.optString("token", "");
+        final String baseUrl = options.optString("baseURL", "");
         String callbackName = options.optString("ecb", null);
         if (callbackName != null) {
             sCallbackFunc = callbackName;
@@ -192,13 +198,13 @@ public class KiiGCM extends CordovaPlugin {
                     callbackContext.error("Failed to get registration ID");
                     return;
                 }
-                installToken(appId, appKey, token, regId, callbackContext);
+                installToken(baseUrl, appId, appKey, token, regId, callbackContext);
                 //callbackContext.success(regId);
             }
         }.execute();
     }
 
-    private void installToken(final String appId, final String appKey, final String token, final String regId, final CallbackContext callbackContext) {
+    private void installToken(final String baseUrl, final String appId, final String appKey, final String token, final String regId, final CallbackContext callbackContext) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... args) {
@@ -215,7 +221,7 @@ public class KiiGCM extends CordovaPlugin {
                 OutputStreamWriter writer = null;
                 BufferedWriter bw = null;
                 try {
-                    URL url = new URL("https://api-jp.kii.com/api/apps/" + appId + "/installations");
+                    URL url = new URL(baseUrl + "/apps/" + appId + "/installations");
                     connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("POST");
                     connection.setDoOutput(true);

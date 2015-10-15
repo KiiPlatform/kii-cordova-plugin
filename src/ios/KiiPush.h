@@ -18,6 +18,7 @@
 @property (nonatomic, copy) NSString* appId;
 @property (nonatomic, copy) NSString* appKey;
 @property (nonatomic, copy) NSString* accessToken;
+@property (nonatomic, copy) NSString* baseUrl;
 
 
 - (void)register:(CDVInvokedUrlCommand*)command;
