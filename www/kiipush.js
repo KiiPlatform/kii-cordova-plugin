@@ -8,6 +8,7 @@ KiiPush.prototype.register = function(kii, options) {
     options['app_id'] = kii.Kii.getAppID();
     options['app_key'] = kii.Kii.getAppKey();
     options['token'] = kii.KiiUser.getCurrentUser().getAccessToken();
+    options['baseURL'] = kii.Kii.getBaseURL();
     options['ecb'] = receivedCallbackName;
     
     cordova.exec(successCallback, errorCallback,

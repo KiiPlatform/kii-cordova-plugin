@@ -1,9 +1,5 @@
 //
 //  KiiPush.h
-//  HelloCordova
-//
-//  Created by fkm on 2015/08/05.
-//
 //
 
 #import <Foundation/Foundation.h>
@@ -22,6 +18,7 @@
 @property (nonatomic, copy) NSString* appId;
 @property (nonatomic, copy) NSString* appKey;
 @property (nonatomic, copy) NSString* accessToken;
+@property (nonatomic, copy) NSString* baseUrl;
 
 
 - (void)register:(CDVInvokedUrlCommand*)command;

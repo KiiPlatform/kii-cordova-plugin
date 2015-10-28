@@ -22,6 +22,9 @@
       <source-file src="src/android/com/kii/cordova/android/KiiGCMReceiver.java" target-dir="src/com/kii/cordova/android/" />
       <source-file src="src/android/com/kii/cordova/android/KiiGCMNotification.java" target-dir="src/com/kii/cordova/android/" />
       <source-file src="src/android/com/kii/cordova/android/MessageType.java" target-dir="src/com/kii/cordova/android/" />
+
+      <source-file src="src/android/libs/gms-base.jar" target-dir="libs/" />
+      <source-file src="src/android/libs/gms-gcm.jar" target-dir="libs/" />
       
       <config-file target="AndroidManifest.xml" parent="/manifest">
         <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -41,16 +44,8 @@
             </intent-filter>
         </receiver>
         <service android:name="com.kii.cordova.android.KiiGCMIntentService" />
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-        <meta-data
-            android:name="com.kii.android.gcm.sender_id"
-            android:value="L$GCM_SENDER_ID" />
       </config-file>
-      <framework src="com.google.android.gms:play-services-gcm:7.5.0" />
-      <framework src="com.android.support:support-v4:22.2.1" />
-      <framework src="com.squareup.okhttp:okhttp:2.4.0" />
+      <dependency id="android.support.v4" />
 
       <config-file target="res/xml/config.xml" parent="/*">
         <feature name="KiiPush">
