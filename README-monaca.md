@@ -1,6 +1,6 @@
 # README for monaca users.
 
-[Monaca](https://ja.monaca.io/)用のプラグインです。Cordova 4.1用のプラグインとして作ります。
+[Monaca](https://ja.monaca.io/)用のプラグインです。
 
 ## プラグインの使い方
 
