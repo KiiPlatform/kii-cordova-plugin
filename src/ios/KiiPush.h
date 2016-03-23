@@ -8,8 +8,8 @@
 
 @interface KiiPush : CDVPlugin
 
-@property (nonatomic, copy) NSString *callbackId;
-@property (nonatomic, copy) NSString *callback;
+@property (nonatomic, copy) NSString *receivedCallback;
+@property (nonatomic, copy) NSString *registerCallback;
 
 @property (nonatomic, strong) NSDictionary *notificationMessage;
 @property BOOL                          isInline;
