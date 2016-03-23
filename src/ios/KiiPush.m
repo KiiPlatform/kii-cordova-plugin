@@ -135,16 +135,6 @@
     }
 }
 
-- (void)setApplicationIconBadgeNumber:(CDVInvokedUrlCommand *)command {
-
-    NSMutableDictionary* options = [command.arguments objectAtIndex:0];
-    int badge = [[options objectForKey:@"badge"] intValue] ?: 0;
-    
-    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:badge];
-    
-    [self successWithMessage:[NSString stringWithFormat:@"app badge count set to %d", badge] callbackId:command.callbackId];
-}
-
 -(void)successWithMessage:(NSString *)message callbackId:(NSString*)callbackId
 {
     CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message];
