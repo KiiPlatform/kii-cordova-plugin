@@ -141,7 +141,7 @@
     [self.commandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
--(void)failWithMessage:(NSString *)message withError:(NSError *)error callbackId:(NSString* callbackId)
+-(void)failWithMessage:(NSString *)message withError:(NSError *)error callbackId:(NSString*)callbackId
 {
     NSString        *errorMessage = (error) ? [NSString stringWithFormat:@"%@ - %@", message, [error localizedDescription]] : message;
     CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage];
