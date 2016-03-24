@@ -8,24 +8,22 @@
 
 - (void)unregister:(CDVInvokedUrlCommand*)command;
 {
-    self.callbackId = command.callbackId;
-    
     [[UIApplication sharedApplication] unregisterForRemoteNotifications];
-    [self successWithMessage:@"unregistered"];
+    [self successWithMessage:@"unregistered" callbackId:command.callbackId];
 }
 
 - (void)register:(CDVInvokedUrlCommand*)command;
 {
-    self.callbackId = command.callbackId;
     
     NSMutableDictionary* options = [command.arguments objectAtIndex:0];
     self.appId = options[@"app_id"];
     self.appKey = options[@"app_key"];
     self.accessToken = options[@"token"];
     self.baseUrl = options[@"baseURL"];
-    
-    self.callback = [options objectForKey:@"ecb"];
+
+    self.receivedCallback = [options objectForKey:@"ecb"];
     self.isInline = NO;
+    self.registerCallback = command.callbackId;
     
     UIApplication *application = [UIApplication sharedApplication];
     
@@ -85,11 +83,11 @@
 
 - (void)didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
 {
-    [self failWithMessage:@"" withError:error];
+    [self failWithMessage:@"" withError:error callbackId:self.registerCallback];
 }
 
 - (void)notificationReceived {
-    if (self.notificationMessage && self.callback)
+    if (self.notificationMessage && self.receivedCallback)
     {
         NSMutableString *jsonStr = [NSMutableString stringWithString:@"{"];
         
@@ -105,7 +103,7 @@
         
         [jsonStr appendString:@"}"];
         
-        NSString * jsCallBack = [NSString stringWithFormat:@"%@(%@);", self.callback, jsonStr];
+        NSString * jsCallBack = [NSString stringWithFormat:@"%@(%@);", self.receivedCallback, jsonStr];
         [self.webView stringByEvaluatingJavaScriptFromString:jsCallBack];
         
         self.notificationMessage = nil;
@@ -137,32 +135,18 @@
     }
 }
 
-- (void)setApplicationIconBadgeNumber:(CDVInvokedUrlCommand *)command {
-    
-    self.callbackId = command.callbackId;
-    
-    NSMutableDictionary* options = [command.arguments objectAtIndex:0];
-    int badge = [[options objectForKey:@"badge"] intValue] ?: 0;
-    
-    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:badge];
-    
-    [self successWithMessage:[NSString stringWithFormat:@"app badge count set to %d", badge]];
-}
--(void)successWithMessage:(NSString *)message
+-(void)successWithMessage:(NSString *)message callbackId:(NSString*)callbackId
 {
-    if (self.callbackId != nil)
-    {
-        CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message];
-        [self.commandDelegate sendPluginResult:commandResult callbackId:self.callbackId];
-    }
+    CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:message];
+    [self.commandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
--(void)failWithMessage:(NSString *)message withError:(NSError *)error
+-(void)failWithMessage:(NSString *)message withError:(NSError *)error callbackId:(NSString*)callbackId
 {
     NSString        *errorMessage = (error) ? [NSString stringWithFormat:@"%@ - %@", message, [error localizedDescription]] : message;
     CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage];
     
-    [self.commandDelegate sendPluginResult:commandResult callbackId:self.callbackId];
+    [self.commandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
 #pragma mark - private
@@ -198,7 +182,16 @@
                               ^(NSData *data, NSURLResponse *response, NSError *error) {
                                   if (error) {
                                       NSLog(@"Error code %ld", (long)error.code);
+                                      if (self.registerCallback) {
+                                          [self failWithMessage:@"Failed to install device token."
+                                                      withError:error
+                                                     callbackId:self.registerCallback];
+                                      }
                                       return;
+                                  }
+                                  if (self.registerCallback) {
+                                      [self successWithMessage:pushToken
+                                                    callbackId:self.registerCallback];
                                   }
                               }
                               ];
