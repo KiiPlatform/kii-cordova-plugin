@@ -1,16 +1,18 @@
 # README for monaca users.
 
-[Monaca](https://ja.monaca.io/)用のプラグインです。 /
+[Monaca](https://ja.monaca.io/)用のプラグインです。
+
 Plug in for [Monaca](https://ja.monaca.io/)
 
-### 外部サービス連携を有効にする / Enable Service Integration.
+### 外部サービス連携を有効にする (Enable Service Integration)
 
-Monaca IDE でプロジェクトを作成後、サービス連携を行います。/ Enable Service Integration for your project created on Monaca IDE
-1. 設定 -> 外部サービス連携 / Config -> Service Integration
-2. KiiCloudPluginを有効にする / Enable Kii Cloud Plugin.
+Monaca IDE でプロジェクトを作成後、サービス連携を行います。(Enable Service Integration for your project created on Monaca IDE)
+
+1. 設定 -> 外部サービス連携 (Config -> Service Integration)
+2. KiiCloudPluginを有効にする (Enable Kii Cloud Plugin)
 
 
-### プラグインを利用する / Use Plugin
+### プラグインを利用する (Use Plugin)
 
 ```javascript
 // Initialize kii Object.
@@ -71,8 +73,9 @@ function pushReceived(data) {
 }
 ```
 
-## 制限事項 / Limitations
- - プレビューでは動作しません。/ Won't work in Preview mode.
- - デバッガービルドは動作保証対象外です。/ Custom Build Debugger is out of support.
- - DevelopmentチャネルへのPush通知は未サポートです。 / Push notification to the development channels is not supported now.
+## 制限事項 (Limitations)
+
+ - プレビューでは動作しません。(Won't work in Preview mode.)
+ - デバッガービルドは動作保証対象外です。(Custom Build Debugger is out of support.)
+ - DevelopmentチャネルへのPush通知は未サポートです。 (Push notification to the development channels is not supported now.)
 
