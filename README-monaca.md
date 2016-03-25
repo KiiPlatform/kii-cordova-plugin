@@ -2,32 +2,12 @@
 
 [Monaca](https://ja.monaca.io/)用のプラグインです。
 
-## プラグインの使い方
-
-まず、プラグインを有効にします。Monacaでプロジェクトを作成し、開いている状態とします。
-
-### Cordovaプラグインとして利用する。
-外部サービス連携を準備中です。
-リリースまでの間Cordovaプラグインとして利用可能です。
-
-1. cloneし、monacaブランチに切り替えます
-2. plugin.xml, src, wwwをzip圧縮します。(MacのFinderでもOK)
-```sh
-zip -r monaca.zip plugin.xml src www
-```
-
-3. Monacaで、ファイル -> Cordovaプラグインの管理
-4. Cordovaプラグインのインポートで、2番で作成したzipを選択
-
-プラグインを更新する場合は、一度削除してから再度インポートしてください。
-プラグインを有効にしたら、JavaScriptで次のコードを実行します。
-
-### 外部サービス連携で利用する。(準備中)
+### 外部サービス連携を有効にする
 
 1. ファイル -> Cordovaプラグインの管理
 2. KiiCloudPluginを有効にする
 
-### プラグインを利用する。
+### プラグインを利用する
 
 ```javascript
 // kiiオブジェクトの初期化
@@ -40,7 +20,7 @@ document.addEventListener('deviceready', function () {
   // APP_ID, APP_KEY, kii.KiiSiteは
   // https://developer.kii.comで作成したアプリの物に置き換えてください。
   kii.Kii.initializeWithSite(APP_ID, APP_KEY, kii.KiiSite.JP);
-  
+
   // Android用の初期設定
   // SharedPreferencesに設定を書き込みます
   // 第1引数はGCMのSENDER_ID (Project ID)
@@ -86,7 +66,7 @@ function pushReceived(data) {
 ```
 
 ## 制限事項
-
-Android / iOS両方でリリースビルドしないと実機では動作しません。
-カスタムデバッガーのビルドは動作保証対象外です。
+ - プレビューでは動作しません。
+ - カスタムデバッガーでビルドしたアプリは動作保証対象外です。
+ - DevelopmentチャネルへのPush通知は未サポートです。
 
