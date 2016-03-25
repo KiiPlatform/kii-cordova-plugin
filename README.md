@@ -20,7 +20,7 @@ Integration(外部サービス連携).
 
 If you need to use version different from released in Monaca Service
 Integration(外部サービス連携), You may use other than master branch and export
-it as zip file and import it. (Monaca payid plan would be required in that case.)
+it as zip file and import it. (Monaca paid plan would be required in that case.)
 
 Take a look at the
 [sample app] (https://github.com/KiiPlatform/monaca-plugin-sample)
