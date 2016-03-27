@@ -2,50 +2,37 @@
 
 [Monaca](https://ja.monaca.io/)用のプラグインです。
 
-## プラグインの使い方
+Plug in for [Monaca](https://ja.monaca.io/)
 
-まず、プラグインを有効にします。Monacaでプロジェクトを作成し、開いている状態とします。
+### 外部サービス連携を有効にする (Enable Service Integration)
 
-### Cordovaプラグインとして利用する。
-外部サービス連携を準備中です。
-リリースまでの間Cordovaプラグインとして利用可能です。
+Monaca IDE でプロジェクトを作成後、サービス連携を行います。(Enable Service Integration for your project created on Monaca IDE)
 
-1. cloneし、monacaブランチに切り替えます
-2. plugin.xml, src, wwwをzip圧縮します。(MacのFinderでもOK)
-```sh
-zip -r monaca.zip plugin.xml src www
-```
+1. 設定 -> 外部サービス連携 (Config -> Service Integration)
+2. KiiCloudPluginを有効にする (Enable Kii Cloud Plugin)
 
-3. Monacaで、ファイル -> Cordovaプラグインの管理
-4. Cordovaプラグインのインポートで、2番で作成したzipを選択
 
-プラグインを更新する場合は、一度削除してから再度インポートしてください。
-プラグインを有効にしたら、JavaScriptで次のコードを実行します。
-
-### 外部サービス連携で利用する。(準備中)
-
-1. ファイル -> Cordovaプラグインの管理
-2. KiiCloudPluginを有効にする
-
-### プラグインを利用する。
+### プラグインを利用する (Use Plugin)
 
 ```javascript
-// kiiオブジェクトの初期化
+// Initialize kii Object.
 var kii
 document.addEventListener('deviceready', function () {
-  // Kii SDKのトップレベルのオブジェクトがkii配下に入る
-  // kii.KiiUserやkii.KiiSiteのようにアクセスする
+  // Kii SDK Top Level object is deployed under kii.
+  // Access the object like `kii.KiiUser` or `kii.KiiSite`.
   kii = window.kii.create();
 
-  // APP_ID, APP_KEY, kii.KiiSiteは
-  // https://developer.kii.comで作成したアプリの物に置き換えてください。
+  // Replace APP_ID, APP_KEY and kii.KiiSite with your app created on
+  // https://developer.kii.com
   kii.Kii.initializeWithSite(APP_ID, APP_KEY, kii.KiiSite.JP);
-  
-  // Android用の初期設定
-  // SharedPreferencesに設定を書き込みます
-  // 第1引数はGCMのSENDER_ID (Project ID)
-  // 第2引数はアプリ起動時にPushが来た時に実行する関数名
-  // 第3引数は成功失敗のcallbackと、バックグラウンド時にどう通知を出すかの設定
+
+  // Initializetion for Android.
+  // It writes configurations o SharedPreferences.
+  // First argument is GCM SENDER_ID (Project ID)
+  // Second argument is callback function when the push message is alived.
+  // It is called only when the application is in foreground.
+  // Third argument is object include
+  // Settings how the push message is handled when the application is in background and callback notifies success/failure of this api call
   window.kiiPush.initAndroid("125448119133", "pushReceived", {
     user: {
       ledColor: "#FFFF00FF",
@@ -66,10 +53,11 @@ document.addEventListener('deviceready', function () {
   });
 });
 
-// デバイスの登録(installation)
-// 第1引数は、ログイン済みのwindow.kii.create()で作ったオブジェクト
-// AppID/AppKey/Token/BaseURLの取得に使います
-// 第2引数は、アプリ起動時にPushが来た時に実行する関数名とcallback
+// Device Token installation to Kii Cloud.
+// First argument is object created by window.kii.create() after the User Login.
+// It use used to obtain Kii Cloud App information and user's access token.
+// Second argument is object includes callback function name handles push notification when the application is in foreground.
+// and callback function notifies success/ failure of this api call.
 window.kiiPush.register(kii, {
   received: "pushReceived",
   success: function (token) {
@@ -81,12 +69,13 @@ window.kiiPush.register(kii, {
 });
 
 function pushReceived(data) {
-  // dataはJSON形式
+  // data is in JSON foramt.
 }
 ```
 
-## 制限事項
+## 制限事項 (Limitations)
 
-Android / iOS両方でリリースビルドしないと実機では動作しません。
-カスタムデバッガーのビルドは動作保証対象外です。
+ - プレビューでは動作しません。(Won't work in Preview mode.)
+ - デバッガービルドは動作保証対象外です。(Custom Build Debugger is out of support.)
+ - DevelopmentチャネルへのPush通知は未サポートです。 (Push notification to the development channels is not supported now.)
 
