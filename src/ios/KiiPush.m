@@ -20,7 +20,11 @@
     self.appKey = options[@"app_key"];
     self.accessToken = options[@"token"];
     self.baseUrl = options[@"baseURL"];
-    self.development = options[@"development"];
+    self.development = false;
+    NSNumber* d = options[@"development"];
+    if (d != nil) {
+        self.development = [d boolValue];
+    }
 
     self.receivedCallback = [options objectForKey:@"ecb"];
     self.isInline = NO;
@@ -79,7 +83,7 @@
     NSString *token = [[[[deviceToken description] stringByReplacingOccurrencesOfString:@"<"withString:@""]
                         stringByReplacingOccurrencesOfString:@">" withString:@""]
                        stringByReplacingOccurrencesOfString: @" " withString: @""];
-    [self installDevice:[NSString stringWithFormat:@"%@", token],
+    [self installDevice:[NSString stringWithFormat:@"%@", token]
             development:self.development];
 }
 
@@ -162,8 +166,8 @@
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
     params[@"installationRegistrationID"] = pushToken;
     params[@"deviceType"] = @"IOS";
-    params[@"development"] = development;
-    
+    params[@"development"] = [NSNumber numberWithBool:self.development];
+
     if (![NSJSONSerialization isValidJSONObject:params]) {
         return;
     }
