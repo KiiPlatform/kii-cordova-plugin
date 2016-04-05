@@ -20,6 +20,11 @@
     self.appKey = options[@"app_key"];
     self.accessToken = options[@"token"];
     self.baseUrl = options[@"baseURL"];
+    self.development = false;
+    NSNumber* d = options[@"development"];
+    if (d != nil) {
+        self.development = [d boolValue];
+    }
 
     self.receivedCallback = [options objectForKey:@"ecb"];
     self.isInline = NO;
@@ -78,7 +83,8 @@
     NSString *token = [[[[deviceToken description] stringByReplacingOccurrencesOfString:@"<"withString:@""]
                         stringByReplacingOccurrencesOfString:@">" withString:@""]
                        stringByReplacingOccurrencesOfString: @" " withString: @""];
-    [self installDevice:[NSString stringWithFormat:@"%@", token]];
+    [self installDevice:[NSString stringWithFormat:@"%@", token]
+            development:self.development];
 }
 
 - (void)didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
@@ -151,7 +157,7 @@
 
 #pragma mark - private
 
-- (void)installDevice:(NSString*)pushToken {
+- (void)installDevice:(NSString*)pushToken development:(BOOL)development {
     NSURLSession *session = [NSURLSession sharedSession];
     
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/apps/%@/installations", self.baseUrl, self.appId]];
@@ -160,8 +166,8 @@
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
     params[@"installationRegistrationID"] = pushToken;
     params[@"deviceType"] = @"IOS";
-    params[@"development"] = @NO;
-    
+    params[@"development"] = [NSNumber numberWithBool:self.development];
+
     if (![NSJSONSerialization isValidJSONObject:params]) {
         return;
     }

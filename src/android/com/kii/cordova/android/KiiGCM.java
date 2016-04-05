@@ -173,6 +173,7 @@ public class KiiGCM extends CordovaPlugin {
         final String appKey = options.optString("app_key", "");
         final String token = options.optString("token", "");
         final String baseUrl = options.optString("baseURL", "");
+        final boolean development = options.optBoolean("development", false);
         String callbackName = options.optString("ecb", null);
         if (callbackName != null) {
             sCallbackFunc = callbackName;
@@ -198,13 +199,13 @@ public class KiiGCM extends CordovaPlugin {
                     callbackContext.error("Failed to get registration ID");
                     return;
                 }
-                installToken(baseUrl, appId, appKey, token, regId, callbackContext);
+                installToken(baseUrl, appId, appKey, token, regId, development, callbackContext);
                 //callbackContext.success(regId);
             }
         }.execute();
     }
 
-    private void installToken(final String baseUrl, final String appId, final String appKey, final String token, final String regId, final CallbackContext callbackContext) {
+    private void installToken(final String baseUrl,final String appId, final String appKey, final String token, final String regId, final boolean development, final CallbackContext callbackContext) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... args) {
@@ -212,6 +213,7 @@ public class KiiGCM extends CordovaPlugin {
                 try {
                     params.put("installationRegistrationID", regId);
                     params.put("deviceType", "ANDROID");
+                    params.put("development", development);
                 } catch (JSONException e) {
                     // nop
                 }
