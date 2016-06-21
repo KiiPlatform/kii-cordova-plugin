@@ -110,7 +110,7 @@
         [jsonStr appendString:@"}"];
         
         NSString * jsCallBack = [NSString stringWithFormat:@"%@(%@);", self.receivedCallback, jsonStr];
-        [self.webView stringByEvaluatingJavaScriptFromString:jsCallBack];
+        [(UIWebView*)self.webView stringByEvaluatingJavaScriptFromString:jsCallBack];
         
         self.notificationMessage = nil;
     }
