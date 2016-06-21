@@ -70,9 +70,12 @@
         [application registerForRemoteNotifications];
     } else {
         // iOS7 or earlier
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         [application registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge |
                                                          UIRemoteNotificationTypeSound |
                                                          UIRemoteNotificationTypeAlert)];
+#pragma clang diagnostic pop
     }
     
     if (self.notificationMessage)			// if there is a pending startup notification
