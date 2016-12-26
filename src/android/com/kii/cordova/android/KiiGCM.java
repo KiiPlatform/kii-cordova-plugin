@@ -200,15 +200,14 @@ public class KiiGCM extends CordovaPlugin {
                     return;
                 }
                 installToken(baseUrl, appId, appKey, token, regId, development, callbackContext);
-                //callbackContext.success(regId);
             }
         }.execute();
     }
 
     private void installToken(final String baseUrl,final String appId, final String appKey, final String token, final String regId, final boolean development, final CallbackContext callbackContext) {
-        new AsyncTask<Void, Void, Void>() {
+        new AsyncTask<Void, Void, String>() {
             @Override
-            protected Void doInBackground(Void... args) {
+            protected String doInBackground(Void... args) {
                 JSONObject params = new JSONObject();
                 try {
                     params.put("installationRegistrationID", regId);
@@ -244,7 +243,7 @@ public class KiiGCM extends CordovaPlugin {
                     bw.close();
 
                     int status = connection.getResponseCode();
-                    return null;
+                    return regId;
 
                 } catch (MalformedURLException e) {
                     return null;
@@ -263,10 +262,8 @@ public class KiiGCM extends CordovaPlugin {
             }
 
             @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-
-                callbackContext.success();
+            protected void onPostExecute(String regId) {
+                callbackContext.success(regId);
             }
         }.execute();
     }
