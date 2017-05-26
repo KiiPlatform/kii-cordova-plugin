@@ -1,0 +1,28 @@
+{
+  "name": "kii-cordova-plugin",
+  "version": "0.8.1",
+  "description": "Plugin for Kii Cloud",
+  "cordova": {
+    "id": "kiicloud-plugin",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KiiPlatform/kii-cordova-plugin.git"
+  },
+  "keywords": [
+    "kiicloud",
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios"
+  ],
+  "author": "Kii Corp",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/KiiPlatform/kii-cordova-plugin/issues"
+  },
+  "homepage": "https://github.com/KiiPlatform/kii-cordova-plugin#readme"
+}
