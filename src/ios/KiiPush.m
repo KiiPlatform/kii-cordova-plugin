@@ -203,6 +203,7 @@
                                       }
                                       return;
                                   }
+                                  NSLog(@"KiiPush installation succeeded!");
                                   if (self.registerCallback) {
                                       [self successWithMessage:pushToken
                                                     callbackId:self.registerCallback];
