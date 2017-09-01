@@ -83,6 +83,7 @@
 }
 
 - (void)didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    NSLog(@"KiiPush didRegisterForRemoteNotificationsWithDeviceToken deviceToken: %@", deviceToken);
     NSString *token = [[[[deviceToken description] stringByReplacingOccurrencesOfString:@"<"withString:@""]
                         stringByReplacingOccurrencesOfString:@">" withString:@""]
                        stringByReplacingOccurrencesOfString: @" " withString: @""];
@@ -92,6 +93,7 @@
 
 - (void)didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
 {
+    NSLog(@"KiiPush didFailToRegisterForRemoteNotificationsWithError error: %@", error);
     [self failWithMessage:@"" withError:error callbackId:self.registerCallback];
 }
 
@@ -161,6 +163,7 @@
 #pragma mark - private
 
 - (void)installDevice:(NSString*)pushToken development:(BOOL)development {
+    NSLog(@"KiiPush installDevice deviceToken: %@, development: %d", pushToken, development);
     NSURLSession *session = [NSURLSession sharedSession];
     
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/apps/%@/installations", self.baseUrl, self.appId]];
@@ -172,11 +175,13 @@
     params[@"development"] = [NSNumber numberWithBool:self.development];
 
     if (![NSJSONSerialization isValidJSONObject:params]) {
+        NSLog(@"KiiPush Invalid params: %@", params);
         return;
     }
     NSError* err;
     NSData* data = [NSJSONSerialization dataWithJSONObject:params options:NSJSONWritingPrettyPrinted error:&err];
     if (err != nil) {
+        NSLog(@"KiiPush NSJSONSerialization error: %@", err);
         return;
     }
     [request setHTTPBody:data];
@@ -190,7 +195,7 @@
                                         completionHandler:
                               ^(NSData *data, NSURLResponse *response, NSError *error) {
                                   if (error) {
-                                      NSLog(@"Error code %ld", (long)error.code);
+                                      NSLog(@"KiiPush installation error code %ld", (long)error.code);
                                       if (self.registerCallback) {
                                           [self failWithMessage:@"Failed to install device token."
                                                       withError:error

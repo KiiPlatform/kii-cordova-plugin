@@ -11,11 +11,13 @@ static char launchNotificationKey;
 @implementation AppDelegate (push)
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    NSLog(@"AppDelegate didRegisterForRemoteNotificationsWithDeviceToken deviceToken: %@", deviceToken);
     KiiPush *pushHandler = [self getCommandInstance:@"KiiPush"];
     [pushHandler didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
 }
 
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+    NSLog(@"AppDelegate didFailToRegisterForRemoteNotificationsWithError error: %@", error);
     KiiPush *pushHandler = [self getCommandInstance:@"KiiPush"];
     [pushHandler didFailToRegisterForRemoteNotificationsWithError:error];
 }
