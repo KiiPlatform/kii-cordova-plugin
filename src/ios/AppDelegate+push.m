@@ -10,7 +10,17 @@ static char launchNotificationKey;
 
 @implementation AppDelegate (push)
 
+void redirectLogToDocuments()
+{
+     NSArray *allPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+     NSString *documentsDirectory = [allPaths objectAtIndex:0];
+     NSString *pathForLog = [documentsDirectory stringByAppendingPathComponent:@"kii-logfile.txt"];
+
+     freopen([pathForLog cStringUsingEncoding:NSASCIIStringEncoding],"a+",stderr);
+}
+
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    redirectLogToDocuments();
     NSLog(@"AppDelegate didRegisterForRemoteNotificationsWithDeviceToken deviceToken: %@", deviceToken);
     KiiPush *pushHandler = [self getCommandInstance:@"KiiPush"];
     [pushHandler didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
