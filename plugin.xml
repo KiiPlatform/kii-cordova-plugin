@@ -62,6 +62,7 @@
           <param name="ios-package" value="KiiPush"/>
         </feature>
       </config-file>
+      <framework src="UserNotifications.framework" />
 
       <source-file src="src/ios/AppDelegate+push.m" />
       <source-file src="src/ios/KiiPush.m" />
