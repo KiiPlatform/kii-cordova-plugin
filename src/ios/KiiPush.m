@@ -12,9 +12,50 @@
     [self successWithMessage:@"unregistered" callbackId:command.callbackId];
 }
 
+
+- (void)registerPushiOS10
+{
+    UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
+    [center requestAuthorizationWithOptions:(UNAuthorizationOptionBadge +
+                                             UNAuthorizationOptionAlert +
+                                             UNAuthorizationOptionSound)
+                          completionHandler:^(BOOL granted, NSError * _Nullable error) {
+                              if (!granted || error != nil) {
+                                  [self failWithMessage:@"Authorization failed."
+                                              withError:error
+                                             callbackId:self.registerCallback];
+                              }
+                          }];
+}
+
+- (void)registerPushiOS8
+{
+    UIApplication *application = [UIApplication sharedApplication];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    UIUserNotificationSettings* notificationSettings =
+    [UIUserNotificationSettings
+     settingsForTypes: UIUserNotificationTypeBadge|UIUserNotificationTypeSound|UIUserNotificationTypeAlert
+     categories:nil];
+    [application registerUserNotificationSettings:notificationSettings];
+    [application registerForRemoteNotifications];
+#pragma clang diagnostic pop
+}
+
+- (void)registerPushiOS7
+{
+    UIApplication *application = [UIApplication sharedApplication];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    [application registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge |
+                                                     UIRemoteNotificationTypeSound |
+                                                     UIRemoteNotificationTypeAlert)];
+#pragma clang diagnostic pop
+}
+
 - (void)register:(CDVInvokedUrlCommand*)command;
 {
-    
+
     NSMutableDictionary* options = [command.arguments objectAtIndex:0];
     self.appId = options[@"app_id"];
     self.appKey = options[@"app_key"];
@@ -29,55 +70,18 @@
     self.receivedCallback = [options objectForKey:@"ecb"];
     self.isInline = NO;
     self.registerCallback = command.callbackId;
-    
-    UIApplication *application = [UIApplication sharedApplication];
-    
-    if ([application respondsToSelector:@selector(registerUserNotificationSettings:)]) {
-        // iOS8
-        // define notification actions (In case of categorized remote push notifications)
-        UIMutableUserNotificationAction *acceptAction = [[UIMutableUserNotificationAction alloc] init];
-        acceptAction.identifier = @"ACCEPT_IDENTIFIER";
-        acceptAction.title = @"Accept";
-        acceptAction.destructive = NO;
-        
-        UIMutableUserNotificationAction *declineAction = [[UIMutableUserNotificationAction alloc] init];
-        declineAction.identifier = @"DECLINE_IDENTIFIER";
-        declineAction.title = @"Decline";
-        // will appear as red
-        declineAction.destructive = YES;
-        // tapping this actions will not launch the app but only trigger background task
-        declineAction.activationMode = UIUserNotificationActivationModeBackground;
-        // this action wil be executed without necessity of pass code authentication (if locked)
-        declineAction.authenticationRequired = NO;
-        
-        // define Categories (In case of categorized remote push notifications)
-        UIMutableUserNotificationCategory *inviteCategory =
-        [[UIMutableUserNotificationCategory alloc] init];
-        inviteCategory.identifier = @"MESSAGE_CATEGORY";
-        [inviteCategory setActions:@[acceptAction, declineAction]
-                        forContext:UIUserNotificationActionContextDefault];
-        [inviteCategory setActions:@[acceptAction, declineAction]
-                        forContext:UIUserNotificationActionContextMinimal];
-        NSSet *categories= [NSSet setWithObject:inviteCategory];
-        
-        // register notification
-        UIUserNotificationSettings* notificationSettings =
-        [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge |
-         UIUserNotificationTypeSound |
-         UIUserNotificationTypeAlert
-                                          categories:categories];
-        [application registerUserNotificationSettings:notificationSettings];
-        [application registerForRemoteNotifications];
+
+    if ( floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_9_x_Max)
+    {
+        // iOS10 or later
+        [self registerPushiOS10];
+    } else if (NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1){
+        // iOS 8, 9
+        [self registerPushiOS8];
     } else {
-        // iOS7 or earlier
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        [application registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge |
-                                                         UIRemoteNotificationTypeSound |
-                                                         UIRemoteNotificationTypeAlert)];
-#pragma clang diagnostic pop
+        [self registerPushiOS7];
     }
-    
+
     if (self.notificationMessage)			// if there is a pending startup notification
         [self notificationReceived];	// go ahead and process it
 }
@@ -99,9 +103,9 @@
     if (self.notificationMessage && self.receivedCallback)
     {
         NSMutableString *jsonStr = [NSMutableString stringWithString:@"{"];
-        
+
         [self parseDictionary:self.notificationMessage intoJSON:jsonStr];
-        
+
         if (self.isInline)
         {
             [jsonStr appendFormat:@"foreground:\"%d\"", 1];
@@ -109,12 +113,12 @@
         }
         else
             [jsonStr appendFormat:@"foreground:\"%d\"", 0];
-        
+
         [jsonStr appendString:@"}"];
-        
+
         NSString * jsCallBack = [NSString stringWithFormat:@"%@(%@);", self.receivedCallback, jsonStr];
         [(UIWebView*)self.webView stringByEvaluatingJavaScriptFromString:jsCallBack];
-        
+
         self.notificationMessage = nil;
     }
 }
@@ -124,11 +128,11 @@
 {
     NSArray         *keys = [inDictionary allKeys];
     NSString        *key;
-    
+
     for (key in keys)
     {
         id thisObject = [inDictionary objectForKey:key];
-        
+
         if ([thisObject isKindOfClass:[NSDictionary class]])
             [self parseDictionary:thisObject intoJSON:jsonString];
         else if ([thisObject isKindOfClass:[NSString class]])
@@ -154,7 +158,7 @@
 {
     NSString        *errorMessage = (error) ? [NSString stringWithFormat:@"%@ - %@", message, [error localizedDescription]] : message;
     CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage];
-    
+
     [self.commandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
@@ -162,7 +166,7 @@
 
 - (void)installDevice:(NSString*)pushToken development:(BOOL)development {
     NSURLSession *session = [NSURLSession sharedSession];
-    
+
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/apps/%@/installations", self.baseUrl, self.appId]];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod:@"POST"];
@@ -184,8 +188,8 @@
     [request addValue:self.appKey forHTTPHeaderField:@"x-kii-appkey"];
     [request addValue:[NSString stringWithFormat:@"bearer %@", self.accessToken] forHTTPHeaderField:@"authorization"];
     [request addValue:@"application/vnd.kii.InstallationCreationRequest+json" forHTTPHeaderField:@"content-type"];
-    
-    
+
+
     NSURLSessionTask *task = [session dataTaskWithRequest:request
                                         completionHandler:
                               ^(NSData *data, NSURLResponse *response, NSError *error) {
