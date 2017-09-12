@@ -24,6 +24,8 @@
                                   [self failWithMessage:@"Authorization failed."
                                               withError:error
                                              callbackId:self.registerCallback];
+                              } else {
+                                  [[UIApplication sharedApplication]registerForRemoteNotifications];
                               }
                           }];
 }
