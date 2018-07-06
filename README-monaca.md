@@ -1,3 +1,7 @@
+# This repository is no longer maintaned. Please use [phonegap-plugin-push](https://github.com/phonegap/phonegap-plugin-push)
+
+To integrate `phonegap-plugin-push` with Kii, please refer to [Sample app](https://github.com/KiiPlatform/kii-push-ionic2).
+
 # README for monaca users.
 
 [Monaca](https://ja.monaca.io/)用のプラグインです。
